@@ -1,0 +1,80 @@
+cmake_minimum_required(VERSION 2.6) #最低版本号2.6
+project(tinymuduo C CXX)               #工程名和工程语言
+
+
+#自定义变量 环境选项
+set(CXX_FLAGS 
+        "
+        -g
+        -Wextra
+        -Werror
+        -Wconversion
+        -Wno-unused-parameter
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpointer-arith
+        -Wshadow
+        -Wwrite-strings
+        -march=native
+        -std=c++14
+        -rdynamic")
+
+
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)   #可执行文件目录
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)      #库输出路径
+
+include_directories(${PROJECT_BINARY_DIR})
+set(INCLUDE_FILE
+    include/Acceptor.h
+    include/Buffer.h
+    include/CallBack.h 
+    include/Channel.h 
+    include/Connector.h 
+    include/Epoller.h
+    include/EventLoop.h
+    include/IPAddress.h
+    include/Logger.h
+    include/noncopyable.h
+    include/Spinlock.h
+    include/TcpClient.h
+    include/TcpConnection.h
+    include/TcpServer.h
+    include/TcpServerSingle.h
+    include/Thread.h
+    include/ThreadPool.h
+    include/Timer.h
+    include/TimerQueue.h
+    include/Timestamp.h
+    include/TimeTask.h
+)
+
+set(SRC_FILE
+    src/Acceptor.cpp 
+    src/Buffer.cpp 
+    src/Channel.cpp 
+    src/Connector.cpp 
+    src/Epoller.cpp 
+    src/EventLoop.cpp 
+    src/IPAddress.cpp 
+    src/Logger.cpp 
+    src/TcpClient.cpp 
+    src/TcpConnection.cpp
+    src/TcpServer.cpp 
+    src/TcpServerSingle.cpp 
+    src/Thread.cpp 
+    src/Timer.cpp 
+    src/TimerQueue.cpp 
+)
+
+add_library(tinymuduo STATIC ${SRC_FILE} ${INCLUDE_FILE})  #源文件目录
+target_link_libraries(tinymuduo pthread)
+
+install(TARGETS tinymuduo DESTINATION lib)
+
+install(FILES ${INCLUDE_FILE} DESTINATION include)
+
+
+add_subdirectory(example)#分支目录
+
+
