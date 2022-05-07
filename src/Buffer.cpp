@@ -189,7 +189,7 @@ void Buffer::ReadString(std::string& ret,int len)
 
 void Buffer::ReadString(char* ret,int len)
 {
-    assert(ReadableBytes()>len);
+    assert(ReadableBytes()>=len);
     Read(ret,len);
 }
 

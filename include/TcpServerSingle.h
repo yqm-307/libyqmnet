@@ -24,11 +24,12 @@ private:
 
     void closeConnection(const TcpConnectionPtr& conn);
 
-    typedef std::unordered_set<TcpConnectionPtr> ConnectionSet;
+    typedef std::unordered_set<TcpConnectionPtr> ConnectionList;
 
     EventLoop* _loop;
     Acceptor _accept;
-    ConnectionSet _connections;
+    ConnectionList _connections;
+    
     ConnectionCallback _connectioncb;
     MessageCallback _msgcb;
     WriteCompleteCallback _writeCompletecb;

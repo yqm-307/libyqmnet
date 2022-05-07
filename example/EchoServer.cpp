@@ -29,6 +29,7 @@ private:
     {
         int n = buff.ReadableBytes();
         char a[1024];
+        memset(a,'\0',sizeof a);
         buff.ReadString(a,n);
         printf("%s\n",a);
         conn->send(a,n);

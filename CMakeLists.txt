@@ -3,21 +3,8 @@ project(tinymuduo C CXX)               #工程名和工程语言
 
 
 #自定义变量 环境选项
-set(CXX_FLAGS 
-        "
-        -g
-        -Wextra
-        -Werror
-        -Wconversion
-        -Wno-unused-parameter
-        -Wold-style-cast
-        -Woverloaded-virtual
-        -Wpointer-arith
-        -Wshadow
-        -Wwrite-strings
-        -march=native
-        -std=c++14
-        -rdynamic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g -Wall")
+
 
 
 

@@ -44,7 +44,7 @@ private:
     typedef std::unique_ptr<TcpServerSingle> TcpServerSinglePtr;
     typedef std::vector<EventLoop*> EventLoopList;
 
-    EventLoop* _baseLoop;   //基础循环
+    EventLoop* _baseLoop;   //主循环
     TcpServerSinglePtr _baseServer;
     ThreadPtrList _threads;
     EventLoopList _loops;
