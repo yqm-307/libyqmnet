@@ -119,7 +119,7 @@ void TcpConnection::sendInLoop(const char* data,size_t len)
     size_t re = len;    //剩余字节数
     bool error = false;
 
-    if(_channel.isWriting())//如果是可写事件
+    if(!_channel.isWriting())//如果没有正在写入
     {
         assert(_output.ReadableBytes() == 0);   //确保缓冲区空
         n = ::write(_sockfd,data,len);          //写了n字节

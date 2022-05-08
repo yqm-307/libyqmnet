@@ -149,7 +149,8 @@ TimeTask* EventLoop::runEvery(Nanosecond interval,TimerCallback callback)
 
 void EventLoop::cancelTimer(TimeTask* timer)
 {
-    _timerQueue.cancelTimer(timer);
+    timer->cancel();
+    //_timerQueue.cancelTimer(timer);
 }
 
 

@@ -43,12 +43,13 @@ private:
         //开个线程跑发送数据
         TcpConnectionPtr conn = ptr;
         std::thread([this,conn](){
-            std::string s;
+            char s[1024];
+            memset(s,'\0',sizeof s);
             while(std::cin>>s)
             {
-                conn->send(s.c_str(),s.size());
+                conn->send(s,sizeof(s));
             }
-        });
+        }).detach();
     }
 
     void OnRecvDate(const TcpConnectionPtr& ptr,Buffer& buffer)
@@ -56,8 +57,10 @@ private:
         char buff[1024];
         int n = buffer.ReadableBytes(); //当前可读字节数
         char a[1024];
+        memset(a,'\0',sizeof a);
         buffer.ReadString(a,n);
         printf("%s\n",a);
+
     }
 
 

@@ -13,7 +13,7 @@ Timer::Timer()
     _new_task(false),
     _task()
 {
-    //开启一个线程
+
     std::thread([this](){
         while(!_try_to_expire){ //一直运行，除非主动关停            
             //当前任务
@@ -23,7 +23,7 @@ Timer::Timer()
                 TimerCallback _callback = _task;
                 int ms = _time;
                 //可以改变cb和time了                
-                printf("休眠%dms",ms);
+                //printf("休眠%dms",ms);
                 is_in_sleep = true; //tryreset可以返回了
                 std::this_thread::sleep_for(std::chrono::milliseconds(ms));   //休眠指定毫秒数
                 _callback();

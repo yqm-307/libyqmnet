@@ -59,7 +59,7 @@ private:
     Millisecond     _interval;      //时间间隔  ms
     TimerCallback   _callback;      //超时回调
     Timestamp       _stamp;         //超时时间  ns
-    bool            _is_canceled;   //是否被取消了
+    std::atomic_bool            _is_canceled;   //是否被取消了
 };
 
 

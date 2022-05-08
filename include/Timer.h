@@ -25,7 +25,7 @@ namespace net
 {
 
 
-class Timer
+class Timer:std::enable_shared_from_this<Timer>
 {
 public:
     Timer();

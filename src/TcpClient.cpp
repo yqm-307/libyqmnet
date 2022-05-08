@@ -34,9 +34,7 @@ void TcpClient::start()
 {
 	_loop->assertInLoopThread();
 	_connector->connect();					//connector调用sys::connect连接
-	_trytimer = _loop->runEvery(3s,[this](){//3s重试一次
-		retry();
-	});
+	if(!_connected) _trytimer = _loop->runEvery(3s,[this](){retry();});
 }
 
 //timetask 3s 尝试一次建立连接
@@ -60,7 +58,7 @@ void TcpClient::OnConnection(int connfd,const IPAddress& local,const IPAddress&p
 {
 	//连接已经完成
 	_loop->assertInLoopThread();
-	_loop->cancelTimer(_trytimer);
+	if(_trytimer!=nullptr) _loop->cancelTimer(_trytimer);
 	_trytimer = nullptr;
 	_connected = true;
 	auto connection = std::make_shared<TcpConnection>(_loop,connfd,local,peer);
