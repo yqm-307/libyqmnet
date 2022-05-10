@@ -42,7 +42,7 @@ public:
     bool operator<(TimeTask& obj)
     {   return !(*this>obj)&&*this!=obj;}
 
-    bool isAutoReset()  {return _interval > 0ms;}
+    bool isAutoReset()  {return _interval.count() > 0;}
     bool isCanceled() const   {return _is_canceled;}    
     void handle()   {_callback();}
     void cancel()   {_is_canceled = true;}  //取消后，定时器执行不休眠，直接返回

@@ -42,7 +42,7 @@ bool Timer::StartOnce(const TimeTask* tsk)
     return StartOnce(tsk->When(),tsk->GetCallback());
 }
 
-//根据时间点定时器
+
 bool Timer::StartOnce(const Timestamp& time ,const TimerCallback& task)
 {
     time_t ms = 0;

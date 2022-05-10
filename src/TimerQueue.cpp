@@ -5,13 +5,14 @@
 
 using namespace net;
 
+#define Task(xx) (*this)
 
 TimerQueue::TimerQueue(EventLoop* loop)
     :_loop(loop),
     _timer(),
     _lock(),
-    _timerqueue([](TimeTask* a,TimeTask* b){
-                return a->interval()<b->interval();
+    _timetasks([](timetask_t a,timetask_t b)->bool{
+                return reinterpret_cast<TimeTask*>(a)->interval() < reinterpret_cast<TimeTask*>(b)->interval();
             })
 {
     std::thread([this](){
@@ -25,10 +26,9 @@ TimerQueue::TimerQueue(EventLoop* loop)
 TimerQueue::~TimerQueue()
 {
     TimeTask* ptr=nullptr;
-    while(_timerqueue.size()>0) //全部析构
+    for(auto& p:_timetasks)
     {
-        ptr = _timerqueue.top();
-        _timerqueue.pop();
+        ptr = p.second;
         delete ptr;
     }
 }
@@ -43,18 +43,19 @@ void TimerQueue::ReSetTimer(TimeTask* task)
         //插回
         {
             std::lock_guard<std::mutex> lock(_lock);
-            _timerqueue.push(task);
+            _timetasks.insert(pair(reinterpret_cast<uint64_t>(task),task));
+
         }
     }
 }
 
 //任务处理程序，执行一次处理一个任务
-//如果是重复任务，则需要重新计算when并插入队列      此处可以优化?  需要出队再入队，不过resettime后也需要再平衡和重新插入差不多了（本身其实也是个链式结构--树）
+//如果是重复任务，则需要重新计算 触发时间 并插入队列     
 void TimerQueue::handle()
 {
     bool t=true;
-    while(_timerqueue.size() <= 0); //等待任务
-    TimeTask* tmp = Top();
+    while(_timetasks.size() <= 0); //等待任务
+    TimeTask* tmp = Front();
     Dequeue();
 
     while(t){
@@ -72,26 +73,22 @@ void TimerQueue::handle()
 
 
 //对外接口 添加定时事件
-TimeTask* TimerQueue::addTimer(Timestamp ts,TimerCallback cb,Millisecond interval)
+timetask_t TimerQueue::addTimer(Timestamp ts,TimerCallback cb,Millisecond interval)
 {
     TimeTask* ptr = new TimeTask(ts,cb,interval);
-    addTimer(ptr);
-    return ptr;
+    timetask_t taskid = reinterpret_cast<uint64_t>(ptr);
+    _timetasks.insert(pair(taskid,ptr));
+
+    return taskid;
 }
 
-void TimerQueue::addTimer(TimeTask* task)
-{
-    _timerqueue.push(task);
-}
 
 //取消一个定时事件
-void TimerQueue::cancelTimer(TimeTask* timer)       
+void TimerQueue::cancelTimer(timetask_t timer)       
 {
-    timer->cancel();
-}
-void TimerQueue::cnacelTimer(TimeTask&& timer)
-{
-    timer.cancel();
+    auto it = _timetasks.find(timer);
+    if(it != _timetasks.end())
+        it->second->cancel();
 }
 
 
@@ -100,17 +97,17 @@ void TimerQueue::cnacelTimer(TimeTask&& timer)
 void TimerQueue::Dequeue()
 {
     std::lock_guard<std::mutex> lock(_lock);
-    _timerqueue.pop();
+    _timetasks.erase(_timetasks.begin());
 }
 
 void TimerQueue::Enqueue(TimeTask* task)
 {
     std::lock_guard<std::mutex> lock(_lock);
-    _timerqueue.push(task);
+    _timetasks.insert(pair(reinterpret_cast<uint64_t>(task),task));
 }
 
-TimeTask* TimerQueue::Top()
+TimeTask* TimerQueue::Front()
 {
     std::lock_guard<std::mutex> lock(_lock);
-    return _timerqueue.top();
+    return _timetasks.begin()->second;
 }

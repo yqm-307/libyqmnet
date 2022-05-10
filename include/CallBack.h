@@ -36,6 +36,9 @@ typedef std::function<void()> Task;
 void defaultConnectionCallback(const TcpConnectionPtr& conn);
 void defaultMessageCallback(const TcpConnectionPtr& conn,Buffer& buff);
 void defaultThreadInitCallback(size_t index);
+
+
+typedef uintptr_t timetask_t; 
 }
 
 

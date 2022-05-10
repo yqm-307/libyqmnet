@@ -35,11 +35,16 @@ public:
     void addTask(const Task& task);
     void addTask(Task&& task);
 
-    //
-    TimeTask* runAt(Timestamp when, TimerCallback callback);
-    TimeTask* runAfter(Nanosecond interval, TimerCallback callback);   
-    TimeTask* runEvery(Nanosecond interval, TimerCallback callback);  
-    void cancelTimer(TimeTask* timer);
+    /**
+     * @brief 定时任务
+     * @param when 触发时间戳
+     * @param callback 回调事件
+     * @return TimeTask* 定时任务句柄
+     */
+    timetask_t runAt(Timestamp when, TimerCallback callback);
+    timetask_t runAfter(Nanosecond interval, TimerCallback callback);
+    timetask_t runEvery(Nanosecond interval, TimerCallback callback);
+    void cancelTimer(timetask_t timeid);
 
     //channel管理
     void updateChannel(Channel* channel);

@@ -11,7 +11,7 @@ TcpClient::TcpClient(EventLoop* loop,const IPAddress& peer)
         :_loop(loop),
         _connected(false),
         _peer(peer),
-        _trytimer(nullptr),
+        _trytimer(NULL),
         _connector(new Connector(loop,peer)),
         _connectioncb(defaultConnectionCallback),
         _msgcb(defaultMessageCallback)
@@ -25,7 +25,7 @@ TcpClient::~TcpClient()
 {
 	if(_connection && !_connection->disconnected())
 		_connection->forceClose();
-	if(_trytimer!=nullptr)
+	if(_trytimer!=NULL)
 		_loop->cancelTimer(_trytimer);
 }
 
@@ -58,8 +58,8 @@ void TcpClient::OnConnection(int connfd,const IPAddress& local,const IPAddress&p
 {
 	//连接已经完成
 	_loop->assertInLoopThread();
-	if(_trytimer!=nullptr) _loop->cancelTimer(_trytimer);
-	_trytimer = nullptr;
+	if(_trytimer!=NULL) _loop->cancelTimer(_trytimer);
+	_trytimer = NULL;
 	_connected = true;
 	auto connection = std::make_shared<TcpConnection>(_loop,connfd,local,peer);
 	_connection = connection;

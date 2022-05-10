@@ -36,7 +36,7 @@ public:
     EventLoop* _loop;
     bool _connected;
     const IPAddress _peer;
-    TimeTask* _trytimer;
+    timetask_t _trytimer;
     ConnectorPtr _connector;
     TcpConnectionPtr _connection;
     ConnectionCallback _connectioncb;

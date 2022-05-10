@@ -6,3 +6,6 @@ target_link_libraries(testThread  tinymuduo)
 
 add_executable(ThreadPool threadpool.cpp)
 target_link_libraries(ThreadPool tinymuduo)
+
+add_executable(timerqueue timerqueue.cpp)
+target_link_libraries(timerqueue tinymuduo)
