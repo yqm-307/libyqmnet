@@ -45,6 +45,7 @@ public:
     size_t ReadableBytes();                 //剩余可读字节
     size_t WriteableBytes();                //剩余可写字节
     size_t PrepareBytes();                  //前置空间
+    size_t DataSize(){return ReadableBytes();}  //buffer 数据段长度
 
     int64_t readfd(int sockfd,int& Errno);  //connector接受数据使用
 

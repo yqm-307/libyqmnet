@@ -47,7 +47,7 @@ private:
             memset(s,'\0',sizeof s);
             while(std::cin>>s)
             {
-                conn->send(s,sizeof(s));
+                conn->send(s,strlen(s));
             }
         }).detach();
     }
@@ -55,7 +55,7 @@ private:
     void OnRecvDate(const TcpConnectionPtr& ptr,Buffer& buffer)
     {
         char buff[1024];
-        int n = buffer.ReadableBytes(); //当前可读字节数
+        int n = buffer.DataSize(); //当前可读字节数
         char a[1024];
         memset(a,'\0',sizeof a);
         buffer.ReadString(a,n);

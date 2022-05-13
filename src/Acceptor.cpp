@@ -19,9 +19,17 @@ void setfdnonblock(int fd)
 }
 int createsockfd()
 {
-    int ret = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
+    int openopt = 1;
+    int ret = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC , 0);
     if (ret == -1)
-        FATAL("Acceptor::socket() create sockfd error!");
+        FATAL("Acceptor::createsockfd create sockfd error!");
+    int setopt = 0;
+    setopt = setsockopt(AF_INET,SOL_SOCKET,SO_REUSEPORT,&openopt,sizeof(openopt));
+    if (setopt == -1)
+        FATAL("Acceptor::createsockfd setsockopt error");
+    setopt = setsockopt(AF_INET,SOL_SOCKET,SO_REUSEADDR,&openopt,sizeof(openopt));
+    if (setopt == -1)
+        FATAL("Acceptor::createsockfd setsockopt error");
     return ret;
 }
 
@@ -35,20 +43,14 @@ Acceptor::Acceptor(EventLoop* loop,const IPAddress& ipport)
         _ip(ipport)
 {
     assert(_listenfd != -1);
-    int a;
-    if(-1 == setsockopt(_listenfd,SOL_SOCKET,SO_REUSEADDR,&a,sizeof(a)))    //重用地址
-        FATAL("Acceptor::Acceptor() setsockopt:SO_REUSEADDR error!");
-    if(-1 == setsockopt(_listenfd,SOL_SOCKET,SO_REUSEPORT,&a,sizeof(a)))    //重用端口
-        FATAL("Acceptor::Acceptor() setsockopt:SO_REUSEPORT error!");
-    if(-1 == ::bind(_listenfd,_ip.getsockaddr(),_ip.getsocklen()))
+    if(-1 == bind(_listenfd,_ip.getsockaddr(),_ip.getsocklen()))
         FATAL("Acceptor::Acceptor() bind error!");
-
 }
 
 
 Acceptor::~Acceptor()
 {
-    ::close(_listenfd);
+    close(_listenfd);
 }
 
 
@@ -102,7 +104,7 @@ void Acceptor::handleRead()
     }
     else    //没有回调直接关闭
     {
-        ::close(_clifd);
+        close(_clifd);
     }
 
 }

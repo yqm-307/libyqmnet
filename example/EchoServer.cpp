@@ -27,7 +27,7 @@ public:
 private:
     void OnRecvDate(const TcpConnectionPtr& conn, Buffer& buff  )
     {
-        int n = buff.ReadableBytes();
+        int n = buff.DataSize();
         char a[1024];
         memset(a,'\0',sizeof a);
         buff.ReadString(a,n);

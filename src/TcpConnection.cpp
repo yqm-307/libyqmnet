@@ -39,7 +39,7 @@ void defaultMessageCallback(const TcpConnectionPtr& conn,Buffer& buff)
     TRACE("connection %s -> %s recv %lu bytes",
           conn->peer().GetIPPort().c_str(),
           conn->local().GetIPPort().c_str(),
-          buff.ReadableBytes());
+          buff.DataSize());
     buff.InitAll(); //初始化缓冲区
 }
 }
@@ -98,15 +98,13 @@ void TcpConnection::send(const char* data,size_t len)
     }
     else
     {
-        _loop->addTask(
-            [ptr = shared_from_this(),str = std::string(data,data+len)]()
-            {ptr->sendInLoop(str.c_str(),sizeof(str.c_str()));}
-        );
+        _loop->addTask([ptr = shared_from_this(),data,len](){
+            ptr->sendInLoop(data, len);
+        });
     }
 }
 
 
-//发送数据
 void TcpConnection::sendInLoop(const char* data,size_t len)
 {
     _loop->assertInLoopThread();
@@ -121,8 +119,8 @@ void TcpConnection::sendInLoop(const char* data,size_t len)
 
     if(!_channel.isWriting())//如果没有正在写入
     {
-        assert(_output.ReadableBytes() == 0);   //确保缓冲区空
-        n = ::write(_sockfd,data,len);          //写了n字节
+        assert(_output.DataSize() == 0);   //确保缓冲区空
+        n = write(_sockfd,data,len);          //写了n字节
         //错误了
         if(n=-1){
             if(errno != EAGAIN){ //非阻塞，可能调用失败
@@ -146,13 +144,13 @@ void TcpConnection::sendInLoop(const char* data,size_t len)
     }
 
 
-    //如果没有出现错误，且还有剩余字节无法写入buffer中
+    //如果没有出现错误，且还有剩余字节无法写入output中
     if(!error && re>0){
         //将剩余数据写入 _output
         if(_highwatermarkcallback)
         {
-            size_t oldlen = _output.ReadableBytes();//当前可读字节数
-            size_t newlen = oldlen+re;              //剩余字节数
+            size_t oldlen = _output.DataSize();//output 当前字节数
+            size_t newlen = oldlen+re;              //写入剩余数据后，buffer 字节数
             if(oldlen < _highWaterMark && newlen >= _highWaterMark)
             {
                 _loop->addTask(std::bind(
@@ -245,20 +243,19 @@ void TcpConnection::Read()
 //sockfd发送数据
 void TcpConnection::Write()
 {
-    if (_state == Disconnected) {   //如果已经断开连接，肯定出错
+    if (_state == Disconnected) {
         WARN("TcpConnection::handleWrite() disconnected, "
-                     "give up writing %lu bytes", _output.ReadableBytes());
+                     "give up writing %lu bytes", _output.DataSize());
         return;
     }
-    assert(_output.ReadableBytes() > 0);    //当前可读字节大于0
-    assert(_channel.isWriting());  //且是可写事件
-    ssize_t n = ::write(_sockfd, _output.peek(), _output.ReadableBytes());
+    assert(_output.DataSize() > 0 && _channel.isWriting());    //output剩余字节数大于0,且是write事件
+    ssize_t n = write(_sockfd, _output.peek(), _output.DataSize());
     if (n == -1) {
         ERROR("TcpConnection::write()");
     }
     else {
         _output.recycle(static_cast<size_t>(n));   //回收output中空间，前面读走多少，我们改变多少
-        if (_output.ReadableBytes() == 0) {
+        if (_output.DataSize() == 0) {
             _channel.disableWrite();
             if (_state == Disconnecting)
                 shutdownInLoop();

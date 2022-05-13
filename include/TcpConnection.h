@@ -67,12 +67,19 @@ private:
     void shutdownInLoop();
     void forceCloseInLoop();
 
-
+    /**
+     * @brief 如果没有正在发送数据，直接发送;如果当前channel中fd正在write，则保存在 outputbuffer 中
+     * @param data 待发送数据
+     * @param len  待发送数据长度
+     */
     void sendInLoop(const char* data,size_t len);
 
     
 
-    void Write();   //
+    /**
+     * @brief 
+     */
+    void Write();
     void Read();
     void Close();
     void Error();
