@@ -17,6 +17,10 @@ public:
     void setConnectionCallback(const ConnectionCallback& cb);
     void setMessageCallback(const MessageCallback& cb);
     void setWriteCompleteCallback(const WriteCompleteCallback& cb);
+    void setEnCode(const EnCodeFunc& cb)
+    { _encode = cb; }
+    void setDeCode(const DeCodeFunc& cb)
+    { _decode = cb; }
 
     void start();
 private:
@@ -33,6 +37,8 @@ private:
     ConnectionCallback _connectioncb;
     MessageCallback _msgcb;
     WriteCompleteCallback _writeCompletecb;
+    DeCodeFunc _decode;
+    EnCodeFunc _encode;
 };
 
 }

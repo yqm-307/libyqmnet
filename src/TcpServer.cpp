@@ -64,6 +64,8 @@ void TcpServer::startInLoop()
     _baseServer->setConnectionCallback(_connectionCallback);
     _baseServer->setMessageCallback(_messageCallback);
     _baseServer->setWriteCompleteCallback(_writeCompleteCallback);
+    if(_decode) _baseServer->setDeCode(_decode);
+    if(_encode) _baseServer->setEnCode(_encode);
     _threadInitCallback(0);
     _baseServer->start();   //主EventLoop 开启监听
 

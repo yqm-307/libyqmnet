@@ -21,7 +21,7 @@ Channel::~Channel()
 { assert(!_handlingEvents);}
 
 
-//处理事件回调
+//处理 注册事件
 void Channel::doTask()
 {
     _loop->assertInLoopThread();

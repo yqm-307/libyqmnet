@@ -34,6 +34,10 @@ public:
     { _messageCallback = cb; }
     void setWriteCompleteCallback(const WriteCompleteCallback& cb)
     { _writeCompleteCallback = cb;}
+    void setEnCode(const EnCodeFunc& cb)
+    { _encode = cb; }
+    void setDeCode(const DeCodeFunc& cb)
+    { _decode = cb; }
 
 private:
     void startInLoop();
@@ -58,6 +62,8 @@ private:
     ConnectionCallback _connectionCallback;
     MessageCallback _messageCallback;
     WriteCompleteCallback _writeCompleteCallback;
+    DeCodeFunc _decode;
+    EnCodeFunc _encode;
 };
 }
 

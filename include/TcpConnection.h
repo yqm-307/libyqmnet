@@ -25,25 +25,27 @@ public:
 
     ~TcpConnection();
 
-    void setMessageCallback(const MessageCallback& cb)
+    void setMessageCallback(const MessageCallback& cb)                          
     { _msgcb = cb; }
-    void setWriteCompleteCallback(const WriteCompleteCallback& cb)
+    void setWriteCompleteCallback(const WriteCompleteCallback& cb)              
     { _writecompletecb = cb; }
-    void setHighWaterMarkVallback(const HighWaterMarkCallback& cb, size_t mark)
+    void setHighWaterMarkVallback(const HighWaterMarkCallback& cb, size_t mark) 
     { _highwatermarkcallback = cb; _highWaterMark = mark;}
-
-    //内部使用
-    void setCloseCallback(const CloseCallback& cb)
+    void setCloseCallback(const CloseCallback& cb)                              
     { _closecb = cb;}
+    void setEnCode(const EnCodeFunc& cb)
+    { _encode = cb; }
+    void setDeCode(const DeCodeFunc& cb)
+    { _decode = cb; }
 
-    //单个tcp服务器
-    void connectBuildOver();
-    
+    //连接状态改变
+    void buildOver();
+
     const IPAddress& local() const
     { return _local;}
     const IPAddress& peer() const
     { return _peer;}
-    bool connected() const;
+    bool isconnected() const;
     bool disconnected() const;
 
 
@@ -77,7 +79,7 @@ private:
     
 
     /**
-     * @brief 
+     * @brief channel触发回调
      */
     void Write();
     void Read();
@@ -99,6 +101,8 @@ private:
     MessageCallback _msgcb;
     WriteCompleteCallback _writecompletecb;
     HighWaterMarkCallback _highwatermarkcallback;
+    DeCodeFunc _decode;
+    EnCodeFunc _encode;
 };
 
 }

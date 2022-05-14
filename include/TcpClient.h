@@ -26,6 +26,10 @@ public:
     { _writeCompletecb = cb;}
     void setErrorCallback(const ErrorCallback& cb)
     { _connector->setErrorCallback(cb);}
+    void setEnCode(const EnCodeFunc& cb)
+    { _encode = cb; }
+    void setDeCode(const DeCodeFunc& cb)
+    { _decode = cb; }
 private:
     void retry();
     void OnConnection(int connfd,const IPAddress& local,const IPAddress& peer);
@@ -39,9 +43,12 @@ public:
     timetask_t _trytimer;
     ConnectorPtr _connector;
     TcpConnectionPtr _connection;
+    
     ConnectionCallback _connectioncb;
     MessageCallback _msgcb;
     WriteCompleteCallback _writeCompletecb;
+    DeCodeFunc _decode;
+    EnCodeFunc _encode;
 };
 
 }

@@ -32,8 +32,12 @@ void TcpServerSingle::OnConnection(int connfd,const IPAddress& local,const IPAdd
     conn->setWriteCompleteCallback(_writeCompletecb);
     conn->setCloseCallback(std::bind(
             &TcpServerSingle::closeConnection, this, _1));
+    if(_decode)
+        conn->setDeCode(_decode);
+    if(_encode)
+        conn->setEnCode(_encode);
     // enable and tie channel
-    conn->connectBuildOver();   //建立连接，启动channel
+    conn->buildOver();   //建立连接，启动channel
     _connectioncb(conn);        //打印数据
 }
 

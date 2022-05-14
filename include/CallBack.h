@@ -18,13 +18,17 @@ using std::placeholders::_3;
 using std::placeholders::_4;
 using std::placeholders::_5;
 
+//TcpConnection
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 typedef std::function<void(const TcpConnectionPtr&)> CloseCallback;
-typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;        //连接建立和断开时回调
-typedef std::function<void(const TcpConnectionPtr&)> WriteCompleteCallback;
+typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;                //连接建立和断开时回调
+typedef std::function<void(const TcpConnectionPtr&)> WriteCompleteCallback;             
 typedef std::function<void(const TcpConnectionPtr&, size_t)> HighWaterMarkCallback;
 typedef std::function<void(const TcpConnectionPtr&, Buffer&)> MessageCallback;
-        //[this](TcpConnectionPtr,Buffer){};
+typedef std::function<void(const TcpConnectionPtr&, Buffer&)> DeCodeFunc;
+typedef std::function<void(const char*,size_t)> EnCodeFunc;
+
+
 
 typedef std::function<void()> TimerCallback;    //计时器的callback
 typedef std::function<void(size_t index)> ThreadInitCallback;   //线程初始化回调函数

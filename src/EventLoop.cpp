@@ -128,7 +128,7 @@ void EventLoop::sleep()
 {
     assert(!_sleeping);
     _sleeping = true;   //休眠中
-    if(!isInLoopThread())   //??
+    if(!isInLoopThread())   
         wakeup();
 }
 

@@ -5,10 +5,10 @@ add_compile_options(
 )
 
 add_executable(EchoClient EchoClient.cpp )
-target_link_libraries(EchoClient  tinymuduo)
+target_link_libraries(EchoClient  yqmnet)
 
 add_executable(EchoServer EchoServer.cpp)
-target_link_libraries(EchoServer  tinymuduo)
+target_link_libraries(EchoServer  yqmnet)
 
 add_subdirectory(other)
 

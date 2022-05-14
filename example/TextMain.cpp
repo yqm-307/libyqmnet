@@ -149,7 +149,7 @@ public:
 
     void onConnect(const TcpConnectionPtr& conn)
     {
-        if(conn->connected())
+        if(conn->isconnected())
             TRACE("连接建立: %s",conn->name().c_str());
         else
             TRACE("断开连接");

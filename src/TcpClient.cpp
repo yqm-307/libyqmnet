@@ -69,8 +69,10 @@ void TcpClient::OnConnection(int connfd,const IPAddress& local,const IPAddress&p
 	_connection->setCloseCallback(std::bind(
 		&TcpClient::closeConnection,this,_1
 	));
+	if(_decode) _connection->setDeCode(_decode);
+	if(_encode) _connection->setEnCode(_encode);
 	//启用并连接channel
-	_connection->connectBuildOver();	//启用channel
+	_connection->buildOver();	//启用channel
 	_connectioncb(connection);			//打印连接信息
 }
 

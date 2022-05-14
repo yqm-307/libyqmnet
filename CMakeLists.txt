@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6) #最低版本号2.6
-project(tinymuduo C CXX)               #工程名和工程语言
+project(yqmnet C CXX)               #工程名和工程语言
 
 
 #自定义变量 环境选项
@@ -54,10 +54,10 @@ set(SRC_FILE
     src/TimerQueue.cpp 
 )
 
-add_library(tinymuduo STATIC ${SRC_FILE} ${INCLUDE_FILE})  #源文件目录
-target_link_libraries(tinymuduo pthread)
+add_library(yqmnet SHARED ${SRC_FILE} ${INCLUDE_FILE})  #源文件目录
+target_link_libraries(yqmnet pthread)
 
-install(TARGETS tinymuduo DESTINATION lib)
+install(TARGETS yqmnet DESTINATION lib)
 
 install(FILES ${INCLUDE_FILE} DESTINATION include)
 

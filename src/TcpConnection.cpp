@@ -30,7 +30,7 @@ void defaultConnectionCallback(const TcpConnectionPtr& conn)
     INFO("connection %s -> %s %s ",
         conn->peer().GetIPPort().c_str(),
         conn->local().GetIPPort().c_str(),
-        conn->connected() ? "up":"down");
+        conn->isconnected() ? "up":"down");
 }
 
 //缺省
@@ -75,7 +75,7 @@ TcpConnection::~TcpConnection()
 
 
 //连接建立完成
-void TcpConnection::connectBuildOver()
+void TcpConnection::buildOver()
 {
     assert(_state == Connecting);
     _state = Connected;
@@ -92,6 +92,9 @@ void TcpConnection::send(const char* data,size_t len)
         WARN("TcpConnection::send() connected,can't send!");
         return;
     }
+    if(_encode)
+        _encode(data,len);
+    
     //当前线程，直接发送
     if(_loop->isInLoopThread()){
         sendInLoop(data,len);   
@@ -236,8 +239,11 @@ void TcpConnection::Read()
     else if (n == 0)    //获取数据量为0，调用close
         Close();
     else
+    {
+        if(_decode)
+            _decode(shared_from_this(),_input);
         _msgcb(shared_from_this(), _input);
-    
+    }
 }
 
 //sockfd发送数据
@@ -307,7 +313,7 @@ void TcpConnection::startRead()
     });
 }
 
-bool TcpConnection::connected() const
+bool TcpConnection::isconnected() const
 { return _state == Connected;}
 
 bool TcpConnection::disconnected() const
