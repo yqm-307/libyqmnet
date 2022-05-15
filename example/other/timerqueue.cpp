@@ -10,6 +10,9 @@ void test1(net::EventLoop& loop)
         Timestamp n = net::clock::now();
         printf("time now : %ld\n",n.time_since_epoch().count()/1000/1000);
     });
+    net::timetask_t ti = loop.runAfter(1s,[](){
+        printf("1safter\n");
+    });
     getchar();
     loop.cancelTimer(timeid);
 }

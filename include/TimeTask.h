@@ -15,7 +15,7 @@ namespace net
 class TimeTask{
 
 public:
-    // 时间戳+回调+回调间隔
+    // 超时时间+超时回调+是否自动重启
     TimeTask(Timestamp ts,TimerCallback cb,Millisecond interval=0ms)
         :_callback(cb),
         _stamp(ts),
