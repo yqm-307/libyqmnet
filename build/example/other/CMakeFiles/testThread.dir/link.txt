@@ -1,0 +1,1 @@
+/usr/bin/g++   -std=c++14 -g -w -std=c++14 -g -w -g  -rdynamic CMakeFiles/testThread.dir/threadtest.cpp.o  -o ../../bin/othertest/testThread  -Wl,-rpath,/home/yqm/Code/Git/libyqmnet/build/lib ../../lib/libyqmnet.so -lpthread 

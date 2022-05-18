@@ -1,0 +1,141 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.6"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "example",
+					"childIndexes" : 
+					[
+						2
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.6"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "example",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				},
+				{
+					"build" : "example/other",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.6"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "example/other",
+					"targetIndexes" : 
+					[
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "yqmnet",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "EchoClient::@70983d692f648185febe",
+					"jsonFile" : "target-EchoClient-Debug-b4ff409116c0dde2cab8.json",
+					"name" : "EchoClient",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "EchoServer::@70983d692f648185febe",
+					"jsonFile" : "target-EchoServer-Debug-694e86b56977f2790a5c.json",
+					"name" : "EchoServer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ThreadPool::@31d1f898d0ca94967586",
+					"jsonFile" : "target-ThreadPool-Debug-24f729493fa2e1d3cdd1.json",
+					"name" : "ThreadPool",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "testThread::@31d1f898d0ca94967586",
+					"jsonFile" : "target-testThread-Debug-fa3928f0abfa44575a15.json",
+					"name" : "testThread",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "timerqueue::@31d1f898d0ca94967586",
+					"jsonFile" : "target-timerqueue-Debug-4a1435a385d8deee74c2.json",
+					"name" : "timerqueue",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "yqmnet::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-yqmnet-Debug-7eb0482b5cbcff922dcf.json",
+					"name" : "yqmnet",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/yqm/Code/Git/libyqmnet/build",
+		"source" : "/home/yqm/Code/Git/libyqmnet"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

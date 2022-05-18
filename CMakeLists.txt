@@ -50,6 +50,7 @@ set(SRC_FILE
     src/TcpServer.cpp 
     src/TcpServerSingle.cpp 
     src/Thread.cpp 
+    include/ThreadPool.h
     src/Timer.cpp 
     src/TimerQueue.cpp 
 )

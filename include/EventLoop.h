@@ -13,7 +13,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include "Timer.h"
+
 #include "Epoller.h"
 #include "TimerQueue.h"
 

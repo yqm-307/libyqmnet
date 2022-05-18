@@ -10,10 +10,11 @@
 #include "Timer.h"
 #include "TimeTask.h"
 #include "Channel.h"
+#include "ThreadPool.h"
 
 namespace net
 {
-class TimerQueue
+class TimerQueue:std::enable_shared_from_this<TimerQueue>
 {
 public:
     typedef std::pair<timetask_t,TimeTask*> pair;
@@ -28,12 +29,10 @@ private:
     void handle();
     void ReSetTimer(TimeTask* task);
 private:
-    void Enqueue(TimeTask* task);
-    void Dequeue();
-    TimeTask* Front();
-private:
     EventLoop* _loop;
     Timer _timer;
+    Util::ThreadPool<TimerCallback> _async_evt_pool;    //异步事件池
+    std::vector<std::pair<timetask_t,TimeTask*>> _timeoutqueue;
     //Channel _channel;
     std::map<timetask_t,TimeTask*,std::function<bool(timetask_t,timetask_t)>> _timetasks;
     //std::priority_queue<timetask_t,std::vector<TimeTask*>,std::function<bool(TimeTask*,TimeTask*)>>         _timerqueue;   //消费者生产者队列——需要加锁：加锁时间只有出队入队可以尝试mutex和spin

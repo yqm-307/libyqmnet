@@ -19,7 +19,6 @@
 #include "CallBack.h"
 #include "Thread.h"		//封装线程
 #include "Logger.h"
-#include "../include/TimerQueue.h"
 
 
 namespace Util{

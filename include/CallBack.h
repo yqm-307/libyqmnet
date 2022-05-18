@@ -30,6 +30,7 @@ typedef std::function<void(const char*,size_t)> EnCodeFunc;
 
 
 
+typedef std::function<void()> TickCallbcak;     //Timer 滴答callback
 typedef std::function<void()> TimerCallback;    //计时器的callback
 typedef std::function<void(size_t index)> ThreadInitCallback;   //线程初始化回调函数
 typedef std::function<void(int sockfd,const IPAddress&, const IPAddress&)> OnConnectCallback;   //新连接的sockfd,本地地址,新连接地址

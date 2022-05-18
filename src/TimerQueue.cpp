@@ -9,16 +9,13 @@ using namespace net;
 
 TimerQueue::TimerQueue(EventLoop* loop)
     :_loop(loop),
-    _timer(),
+    _timer(10ms,[this](){handle();}),
     _lock(),
+    _async_evt_pool(10),
     _timetasks([](timetask_t a,timetask_t b)->bool{
-                return reinterpret_cast<TimeTask*>(a)->interval() < reinterpret_cast<TimeTask*>(b)->interval();
+                return reinterpret_cast<TimeTask*>(a)->When() < reinterpret_cast<TimeTask*>(b)->When();
             })
 {
-    std::thread([this](){
-        while(1)
-            handle();   
-    }).detach();
 }
 
 
@@ -49,30 +46,56 @@ void TimerQueue::ReSetTimer(TimeTask* task)
     }
 }
 
-//任务处理程序，执行一次处理一个任务
-//如果是重复任务，则需要重新计算 触发时间 并插入队列     
+//超时任务添加到 threadpool 中   
 void TimerQueue::handle()
 {
-    bool t=true;
-    while(_timetasks.size() <= 0); //等待任务
-    TimeTask* tmp = Front();
-    Dequeue();
-
-    while(t){
-        if(_timer.TryReset(tmp))    //执行
+    auto now = clock::now();
+    {
+        std::lock_guard<std::mutex> lock(_lock);
+        auto& timeoutqueue = _timeoutqueue;    //超时对了
+        for (auto p : _timetasks)
         {
-            t!=t;
-            if(tmp->isAutoReset())  //重新入队或释放
-                ReSetTimer(tmp);
+            if (p.second->When() <= now)//超时的
+            
+                timeoutqueue.push_back(p);  
             else
-                delete tmp;
+                break;
         }
+
+        TimeTask* task;
+
+        //删除节点或 autoset
+        for(auto p:timeoutqueue)
+        {
+            task = p.second;
+            _timetasks.erase(p.first);
+            if(task->isCanceled())
+            {
+                delete task;
+                continue;
+            }
+            _async_evt_pool.AddTask(task->GetHandle());
+            if(task->isAutoReset())
+            {
+                task->updateStamp();
+                _timetasks.insert(p);
+            }
+            else
+                delete task;
+        }
+        timeoutqueue.clear();
     }
 }
 
 
-
-//对外接口 添加定时事件
+/**
+ * @brief   将根据超时时间设置一个 timetask 并 添加到定时器队列中
+ * 
+ * @param ts    超时时间点
+ * @param cb    超时回调
+ * @param interval  触发间隔
+ * @return timetask_t   定时事件句柄
+ */
 timetask_t TimerQueue::addTimer(Timestamp ts,TimerCallback cb,Millisecond interval)
 {
     TimeTask* ptr = new TimeTask(ts,cb,interval);
@@ -83,7 +106,11 @@ timetask_t TimerQueue::addTimer(Timestamp ts,TimerCallback cb,Millisecond interv
 }
 
 
-//取消一个定时事件
+/**
+ * @brief 取消本次事件
+ * 
+ * @param timer 定时事件句柄 
+ */
 void TimerQueue::cancelTimer(timetask_t timer)       
 {
     auto it = _timetasks.find(timer);
@@ -93,21 +120,3 @@ void TimerQueue::cancelTimer(timetask_t timer)
 
 
 
-
-void TimerQueue::Dequeue()
-{
-    std::lock_guard<std::mutex> lock(_lock);
-    _timetasks.erase(_timetasks.begin());
-}
-
-void TimerQueue::Enqueue(TimeTask* task)
-{
-    std::lock_guard<std::mutex> lock(_lock);
-    _timetasks.insert(pair(reinterpret_cast<uint64_t>(task),task));
-}
-
-TimeTask* TimerQueue::Front()
-{
-    std::lock_guard<std::mutex> lock(_lock);
-    return _timetasks.begin()->second;
-}

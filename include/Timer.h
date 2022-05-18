@@ -17,6 +17,7 @@
 #include <iostream>
 #include <chrono>
 #include "CallBack.h"
+#include "ThreadPool.h"
 #include "Timestamp.h"
 #include "Spinlock.h"
 #include "TimeTask.h"
@@ -24,33 +25,20 @@
 namespace net
 {
 
-
 class Timer:std::enable_shared_from_this<Timer>
 {
 public:
-    Timer();
-    ~Timer(){ Stop();};
-
-
-    bool TryReset(const Timestamp& interval,TimerCallback task);   //尝试set
-    bool TryReset(const TimeTask*);   //尝试set
-    bool TryReset(int interval,const TimerCallback& task);        //根据时间间隔
+    Timer(Millisecond tick,TimerCallback cb);
+    Timer()=default;
+    ~Timer(){Stop();}
+    void Start();
 private:
-    bool StartOnce(const TimeTask*);
-    bool StartOnce(const Timestamp& point,const TimerCallback& task);     //根据时间戳
-    bool StartOnce(int interval,const TimerCallback& task);        //根据时间间隔
     void Stop();
-    bool isInSleep(){ return is_in_sleep;}
 
 private:
-    std::atomic<bool> _expired;             //失效标志
-    std::atomic<bool> _try_to_expire;       //尝试停止     
-    bool is_in_sleep;                       //正在睡眠               
-    Spinlock _spin;                         //自旋锁    
-    std::atomic<bool> _new_task;            
-    int _time;
-    TimerCallback _task;                 
-
+    std::atomic_bool    _running;
+    Millisecond         _time;
+    TickCallbcak _task;     //tick                 
 };
 
 

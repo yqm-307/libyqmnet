@@ -31,6 +31,53 @@ inline Timestamp nowAfter(Nanosecond interval)
 inline Timestamp nowBefore(Nanosecond interval)
 { return now() - interval; }
 
+inline time_t utcms(Timestamp&& ts)
+{
+    return ts.time_since_epoch().count()/1000/1000;
+}
+
+//月份
+inline time_t day(Timestamp&& ts= now())
+{
+    time_t tt = system_clock::to_time_t(ts);
+    tm utc_tm = *gmtime(&tt);
+    return utc_tm.tm_mday;
+}
+inline time_t month(Timestamp&& ts=now())
+{
+    time_t s = utcms(std::move(ts))/1000;    //ms
+    return (s%(31556952)/(2629746));
+}
+inline time_t hour(Timestamp&& ts=now())
+{
+    time_t s = utcms(std::move(ts))/1000;    //ms
+    return (s%(86400))/(3600);
+}
+inline time_t year(Timestamp&& ts=now())
+{
+    time_t tt = system_clock::to_time_t(ts);
+    tm utc_tm = *gmtime(&tt);
+    return 1900+utc_tm.tm_year;
+
+}
+
+inline time_t minute(Timestamp&& ts=now())
+{
+    time_t tt = system_clock::to_time_t(ts);
+    tm utc_tm = *gmtime(&tt);
+    return utc_tm.tm_min;
+}
+inline time_t second(Timestamp&& ts=now())
+{
+    time_t tt = system_clock::to_time_t(ts);
+    tm utc_tm = *gmtime(&tt);
+    return utc_tm.tm_sec;
+}
+inline time_t millisecond(Timestamp&& ts=now())
+{
+    time_t ms = utcms(std::move(ts));
+    return (ms%1000);
+}
 }
 
 }

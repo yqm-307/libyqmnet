@@ -45,10 +45,10 @@ public:
     bool isAutoReset()  {return _interval.count() > 0;}
     bool isCanceled() const   {return _is_canceled;}    
     void handle()   {_callback();}
+    TimerCallback GetHandle(){return _callback;}
     void cancel()   {_is_canceled = true;}  //取消后，定时器执行不休眠，直接返回
     Millisecond interval()  {return _interval;}
     Timestamp When() const  {return _stamp;} 
-    TimerCallback GetCallback() const {return _callback;}
     //时间间隔更新新的超时时间
     void updateStamp()
     {
