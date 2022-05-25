@@ -9,11 +9,15 @@
 #include "noncopyable.h"
 #include <functional>
 
-namespace  net
-{
 #ifndef LOG_LEVEL
 #define LOG_LEVEL -1
 #endif
+#define ARRAY_NUM 8
+#define ARRAY_SIZE 1024*4   //4kb   linux下每次读写为4kb时，用户cpu时间和系统cpu时间最短
+
+
+namespace  net
+{
 
 enum LOGLEVEL
 {
@@ -35,24 +39,44 @@ static const char* LeveL[6]{
 };
 
 //缓冲日志
-class Logger : noncopyable
+
+class Logger:noncopyable
 {
 public:
-    static Logger* GetInstance(std::string name = "./log");
-    void Log(LOGLEVEL level,const std::string& log);
+    static Logger* GetInstance(std::string name = "./log.txt");
+    void Log(LOGLEVEL level,const std::string log);
     static void SetFileName(std::string name);
 private:
     Logger(std::string);
     ~Logger();
-    bool Dequeue(std::string& str);
+    const char* GetFullArray();
     void Enqueue(std::string log);
+    char* workarray(){return _buffers[_nowindex].second;}
+    /**
+     * @brief nowindex 前进
+     */
+    void next();
+    /**
+     * @brief Pendingwriteindex 前进
+     */
+    void nextPending();
+    bool hasfulled(){return _pendingwriteindex!=_nowindex;}
+    //todo flush 服务器关闭前，主动冲洗剩余内存
 private:
-    std::queue<std::string> _queue;
-    std::thread* _writeThread;       //不断dequeue
+    //std::queue<std::string> _queue;
+    //buffer，第一个值是下一个节点下标。第二个值是储存数据
+    std::vector<std::pair<int,char*>> _buffers;    //缓冲区
+    int _nowsize;
+    int _pendingwriteindex;     //待写入
+    int _nowindex;              //当前
+
+    std::thread* _writeThread;      //不断dequeue
     std::mutex _mutex;
     std::string filename;           //文件名可配置
     std::function<void ()>  work;
     int _openfd;                    //文件
+    std::condition_variable _cond;
+    std::mutex _condlock;
 };
 
 std::string format(const char* fmt, ...);
