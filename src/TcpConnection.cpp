@@ -124,14 +124,15 @@ void TcpConnection::sendInLoop(const char* data,size_t len)
     {
         assert(_output.DataSize() == 0);   //确保缓冲区空
         n = write(_sockfd,data,len);          //写了n字节
-        //错误了
-        if(n=-1){
+        int saveerrno = errno;
+        if(n==-1){
             if(errno != EAGAIN){ //非阻塞，可能调用失败
-                ERROR("TcpConnection::write()");
+                ERROR("TcpConnection::sendInLoop() write() %d",errno);
                 if(errno == EPIPE)  //close_wait状态发送数据会触发epipe
                     error = true;
                 if(errno == ECONNRESET) //
                     error = true;
+                errno = saveerrno;
             }
             n=0;
         }

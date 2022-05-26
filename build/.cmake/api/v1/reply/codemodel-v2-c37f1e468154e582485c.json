@@ -19,14 +19,15 @@
 					"source" : ".",
 					"targetIndexes" : 
 					[
-						5
+						6
 					]
 				},
 				{
 					"build" : "example",
 					"childIndexes" : 
 					[
-						2
+						2,
+						3
 					],
 					"minimumCMakeVersion" : 
 					{
@@ -53,8 +54,22 @@
 					"targetIndexes" : 
 					[
 						2,
-						3,
-						4
+						4,
+						5
+					]
+				},
+				{
+					"build" : "example/httpserver",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.6"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "example/httpserver",
+					"targetIndexes" : 
+					[
+						3
 					]
 				}
 			],
@@ -66,7 +81,8 @@
 					[
 						0,
 						1,
-						2
+						2,
+						3
 					],
 					"name" : "yqmnet",
 					"targetIndexes" : 
@@ -76,7 +92,8 @@
 						2,
 						3,
 						4,
-						5
+						5,
+						6
 					]
 				}
 			],
@@ -101,6 +118,13 @@
 					"id" : "ThreadPool::@31d1f898d0ca94967586",
 					"jsonFile" : "target-ThreadPool-Debug-24f729493fa2e1d3cdd1.json",
 					"name" : "ThreadPool",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "httpserver::@067c6c824a5014e794b6",
+					"jsonFile" : "target-httpserver-Debug-d4b6c43e42300486721e.json",
+					"name" : "httpserver",
 					"projectIndex" : 0
 				},
 				{

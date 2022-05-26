@@ -98,5 +98,10 @@
   "directory": "/home/yqm/Code/Git/libyqmnet/build/example/other",
   "command": "/usr/bin/g++   -I/home/yqm/Code/Git/libyqmnet/build   -std=c++14 -g -w -std=c++14 -g -w -g   -g -std=c++14 -o CMakeFiles/testThread.dir/threadtest.cpp.o -c /home/yqm/Code/Git/libyqmnet/example/other/threadtest.cpp",
   "file": "/home/yqm/Code/Git/libyqmnet/example/other/threadtest.cpp"
+},
+{
+  "directory": "/home/yqm/Code/Git/libyqmnet/build/example/httpserver",
+  "command": "/usr/bin/g++   -I/home/yqm/Code/Git/libyqmnet/build   -std=c++14 -g -w -std=c++14 -g -w -g   -g -std=c++14 -o CMakeFiles/httpserver.dir/httpserver.cpp.o -c /home/yqm/Code/Git/libyqmnet/example/httpserver/httpserver.cpp",
+  "file": "/home/yqm/Code/Git/libyqmnet/example/httpserver/httpserver.cpp"
 }
 ]

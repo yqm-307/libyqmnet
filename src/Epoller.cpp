@@ -25,11 +25,15 @@ void Epoller::poll(ChannelList& Channels)
 {
     _loop->assertInLoopThread();
 
+    int saveErrno = errno;
     size_t num = _events.size();
     ssize_t n=0;
-    if( -1 >= (n = epoll_wait(_epfd,_events.data(),num,0)))
-        ERROR("Epoller::poll() error");
-    
+    if( 0 > (n = epoll_wait(_epfd,_events.data(),num,100)))
+    {
+        if(errno == EINTR)
+            ERROR("Epoller::poll() epoll_wait errcode EINTR");
+        errno = saveErrno;
+    }
     for(int i=0;i<n;++i)
     {
         epoll_event evt = _events[i];

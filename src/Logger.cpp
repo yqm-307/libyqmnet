@@ -1,6 +1,4 @@
 #include "../include/Logger.h"
-
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
@@ -11,6 +9,9 @@
 
 using namespace net;
 
+//#define YNET_LOG_BUFFER
+
+
 
 
 Logger* Logger::GetInstance(std::string name)
@@ -19,7 +20,7 @@ Logger* Logger::GetInstance(std::string name)
     return _instance;
 }
 
-
+#ifdef YNET_LOG_BUFFER
 Logger::Logger(std::string name)
     :_pendingwriteindex(0),
     _nowindex(0),
@@ -49,28 +50,45 @@ Logger::Logger(std::string name)
                 assert(re>=0); 
                 fullnum-=re;     
             }
+
         }
     };
     _writeThread = new std::thread(work);
 }
+#else
+Logger::Logger(std::string name)
+{
+    filename = name;
+    _openfd = open(filename.c_str(),O_RDWR|O_CREAT|O_APPEND,S_IRWXU);  //读写打开文件
+    work = [this](){
+        while(1)
+        {
+            static std::string line="";
+            if(this->_queue.empty())
+                continue;
+            this->Dequeue(line);                //取
+            write(this->_openfd,line.c_str(),line.size());  //写
+        }
+    };
+    _writeThread = new std::thread(work);
+}
+#endif
 
 
 
 Logger::~Logger()
 {
+#ifdef YNET_LOG_BUFFER
     next(); //写入所有数据
+#endif
     close(_openfd); //关闭文件描述符
 }
 
 
-const char* Logger::GetFullArray()
-{
-    const char* ret = _buffers[_pendingwriteindex].second;
-    _pendingwriteindex = _buffers[_pendingwriteindex].first;
-    return ret;
-}
 
 
+
+#ifdef YNET_LOG_BUFFER
 //写入缓冲
 void Logger::Enqueue(std::string log)
 {
@@ -99,6 +117,13 @@ void Logger::Enqueue(std::string log)
     }
 }
 
+const char* Logger::GetFullArray()
+{
+    const char* ret = _buffers[_pendingwriteindex].second;
+    _pendingwriteindex = _buffers[_pendingwriteindex].first;
+    return ret;
+}
+
 
 void Logger::next()
 {
@@ -122,6 +147,27 @@ void Logger::next()
 void Logger::nextPending()
 {
 }
+#else
+
+void Logger::Enqueue(std::string log)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    _queue.push(log);
+}
+
+bool Logger::Dequeue(std::string& str)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    if(_queue.size()<=0)
+        return false;
+    str = _queue.front();   //取队首
+    _queue.pop();           //出队
+    return true;
+}
+
+#endif
+
+
 
 void Logger::Log(LOGLEVEL level ,const std::string str)
 {
@@ -173,7 +219,6 @@ void Logger::Log(LOGLEVEL level ,const std::string str)
     strcpy(log+strlen(log),"\n");
     Enqueue(log);
 }
-
 
 
 

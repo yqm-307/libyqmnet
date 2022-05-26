@@ -20,17 +20,19 @@ void setfdnonblock(int fd)
 int createsockfd()
 {
     int openopt = 1;
-    int ret = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC , 0);
-    if (ret == -1)
-        FATAL("Acceptor::createsockfd create sockfd error!");
+    int sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC , 0);
+    if (sockfd == -1)
+        FATAL("Acceptor::createsockfd() create sockfd error!");
     int setopt = 0;
-    setopt = setsockopt(AF_INET,SOL_SOCKET,SO_REUSEPORT,&openopt,sizeof(openopt));
+
+    setopt = setsockopt(sockfd,SOL_SOCKET,SO_REUSEPORT,&openopt,sizeof(openopt));
     if (setopt == -1)
-        FATAL("Acceptor::createsockfd setsockopt error");
-    setopt = setsockopt(AF_INET,SOL_SOCKET,SO_REUSEADDR,&openopt,sizeof(openopt));
+        FATAL("Acceptor::createsockfd() setsockopt error");
+    
+    setopt = setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&openopt,sizeof(openopt));
     if (setopt == -1)
-        FATAL("Acceptor::createsockfd setsockopt error");
-    return ret;
+        FATAL("Acceptor::createsockfd() setsockopt error");
+    return sockfd;
 }
 
 

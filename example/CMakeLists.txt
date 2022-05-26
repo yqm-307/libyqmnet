@@ -12,4 +12,5 @@ target_link_libraries(EchoServer  yqmnet)
 
 add_subdirectory(other)
 
+add_subdirectory(httpserver)
 

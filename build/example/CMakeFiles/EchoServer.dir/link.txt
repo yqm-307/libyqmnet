@@ -1,1 +1,0 @@
-/usr/bin/g++   -std=c++14 -g -w -g  -rdynamic CMakeFiles/EchoServer.dir/EchoServer.cpp.o  -o ../bin/EchoServer  -Wl,-rpath,/home/yqm/Code/Git/libyqmnet/build/lib ../lib/libyqmnet.so -lpthread 
