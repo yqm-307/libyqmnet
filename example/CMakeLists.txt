@@ -14,3 +14,5 @@ add_subdirectory(other)
 
 add_subdirectory(httpserver)
 
+add_subdirectory(nthreadserver)
+
