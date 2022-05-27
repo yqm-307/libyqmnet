@@ -32,6 +32,8 @@ void Epoller::poll(ChannelList& Channels)
     {
         if(errno == EINTR)
             ERROR("Epoller::poll() epoll_wait errcode EINTR");
+        ERROR("Epoller::poll() epoll_wait errno:%d",errno);
+        //exit(-1);
         errno = saveErrno;
     }
     for(int i=0;i<n;++i)

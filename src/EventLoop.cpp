@@ -65,6 +65,7 @@ EventLoop::~EventLoop()
     t_Eventloop == nullptr;
 }
 
+
 //将task加入taskqueue
 void EventLoop::addTask(const Task& task)
 {
@@ -73,13 +74,8 @@ void EventLoop::addTask(const Task& task)
         task(); 
         return;
     }
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        this->_pendingTasks.push_back(task);
-    }
-    //不在线程中，或者正在处理任务，都唤醒线程
-    if(!isInLoopThread() || _doingPendingTasks )
-        wakeup();
+    else
+        addInQueue(task);
 }
 
 //将task加入taskqueue   (右值版)
@@ -90,6 +86,23 @@ void EventLoop::addTask(Task&& task)
         task(); 
         return;
     }
+    else
+        addInQueue(std::move(task));
+
+}
+
+void EventLoop::addInQueue(const Task& task)
+{
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+        _pendingTasks.push_back(task);
+    }
+    if(!isInLoopThread() || _doingPendingTasks)
+        wakeup();
+}
+
+void EventLoop::addInQueue(Task&& task)
+{
     {
         std::lock_guard<std::mutex> lock(_mutex);
         _pendingTasks.push_back(std::move(task));
@@ -116,7 +129,7 @@ void EventLoop::loop()
     while(!_sleeping)
     {
         _channels.clear();
-        _poller.poll(_channels);    //获取可读、可写事件
+        _poller.poll(_channels);    //从epoll 中获取的读写事件
         for(auto p : _channels)
             p->doTask();
         doPendingTasks();

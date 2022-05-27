@@ -11,7 +11,6 @@ Timer::Timer(Millisecond tick,TickCallbcak cb)
     _task(cb),
     _running(false)
 {
-    Start();
 }
 
 

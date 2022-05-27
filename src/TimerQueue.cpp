@@ -9,13 +9,12 @@ using namespace net;
 
 TimerQueue::TimerQueue(EventLoop* loop)
     :_loop(loop),
-    _timer(10ms,[this](){handle();}),
-    _lock(),
-    _async_evt_pool(10),
+    _timer(YNET_TIMER_TICK,[this](){handle();}),    
+    _async_evt_pool(YNET_TIMER_ASYNCEVENTSPOOL_SIZE),
     _timetasks([](timetask_t a,timetask_t b)->bool{
-                return reinterpret_cast<TimeTask*>(a)->When() < reinterpret_cast<TimeTask*>(b)->When();
-            })
+                return reinterpret_cast<TimeTask*>(a)->When() < reinterpret_cast<TimeTask*>(b)->When();})
 {
+    _timer.Start();
 }
 
 

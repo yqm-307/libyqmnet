@@ -1,6 +1,7 @@
 #ifndef ACCEPTOR_H
 #define ACCEPTOR_H
 
+#include "Config.h"
 #include "noncopyable.h"
 #include "IPAddress.h"
 #include "Channel.h"

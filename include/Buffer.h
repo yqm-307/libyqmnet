@@ -11,6 +11,7 @@
 #include <string>
 #include <cassert>
 #include <cstring>
+#include "Config.h"
 #include "Logger.h"
 
 namespace net

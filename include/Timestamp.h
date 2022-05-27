@@ -2,6 +2,7 @@
 #define TIMESTAMP_H
 
 #include <chrono>
+#include "Config.h"
 
 namespace net
 {

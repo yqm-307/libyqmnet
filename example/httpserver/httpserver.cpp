@@ -9,24 +9,35 @@
 
 using namespace std;
 using namespace net;
-const char* res = "HTTP/1.1 200 OK\r\n\
-Content-Length:98\r\n\
-Connection:keep-alive\r\n\
-<html>\
-<h>hello world</h>\
+const char* res = 
+"HTTP/1.1 200 OK \
+Content-Length:219 \
+Connection:keep-alive \
+\r\n \
+<!DOCTYPE html> \
+<html> \
+    <head> \
+        <meta charset=\"UTF-8\"> \
+        <title>WebServer</title> \
+    </head> \
+    <body> \
+    hello world \
+    </body> \
 </html>\r\n";
 
 
-class EchoServer
+class httpserver
 {
 public:
-    EchoServer(EventLoop* loop,IPAddress ip)
+    httpserver(EventLoop* loop,IPAddress ip)
         :_ip(ip),
         _loop(loop),
         _server(_loop,_ip)
     {
+        _server.setConnectionCallback(std::bind(
+            &httpserver::OnConnection,this,_1));
         _server.setMessageCallback(std::bind(
-            &EchoServer::OnRecvDate,this,_1,_2));
+            &httpserver::OnRecvDate,this,_1,_2));
     }
     
     void start()
@@ -35,6 +46,12 @@ public:
     }
 
 private:
+    void OnConnection(const TcpConnectionPtr& conn)
+    {
+        //conn->send(res,strlen(res));
+        //printf("[send]\n%s",res);
+    }
+
     void OnRecvDate(const TcpConnectionPtr& conn, Buffer& buff  )
     {
         int n = buff.DataSize();
@@ -42,7 +59,7 @@ private:
         memset(a,'\0',sizeof a);
         buff.ReadString(a,n);
         printf("%s\n",a);
-         conn->send(res,strlen(res));
+        conn->send(res,strlen(res));
     }
 private:
     net::IPAddress _ip;
@@ -52,9 +69,9 @@ private:
 
 int main()
 {
-    net::Logger::GetInstance("./echoserver.log");
+    net::Logger::GetInstance("./httpserver.log");
     net::EventLoop loop;
-    EchoServer server(&loop,IPAddress(8888));
+    httpserver server(&loop,IPAddress(10100));
     server.start();
     loop.loop();
 }

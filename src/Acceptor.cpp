@@ -73,7 +73,6 @@ bool Acceptor::listening()
 //开始监听
 void Acceptor::listen()
 {
-        //监听套接字
     _loop->assertInLoopThread();
     if(-1==::listen(_listenfd,1024))
         FATAL("Acceptor::listen() error!");

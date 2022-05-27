@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include "Config.h"
 #include "IPAddress.h"
 
 namespace net

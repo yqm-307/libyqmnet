@@ -7,9 +7,12 @@ isclear="$*"
 #清理cmake和makefile文件
 clearfile()
 {
-    find .  -name 'Makefile' -o -name '*.camke' -o -name 'CMakeCache.txt' -o -name '*.log'  -o -name 'cmake_install.cmake'  -print | xargs rm
+    find . -name 'Makefile' -o -name '*.camke' -o -name 'CMakeCache.txt' -o -name 'cmake_install.cmake'  -print | xargs rm
+    find . -name '*.log' -print | xargs rm
     find . -name 'Makefile' -print |xargs rm
     find . -name 'CMakeFiles' -type d -print | xargs rm -rf
+    rm -rf build
+    
     echo "清理成功"
 }
 

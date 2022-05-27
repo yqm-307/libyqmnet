@@ -6,8 +6,13 @@
 #include <atomic>
 #include <memory>
 #include <condition_variable>   //mutex
+#include "Config.h"
 #include "noncopyable.h"
 #include <functional>
+
+#if LOGGER_BUFFER_OFF
+#define YNET_LOG_BUFFER
+#endif
 
 #ifndef LOG_LEVEL
 #define LOG_LEVEL -1

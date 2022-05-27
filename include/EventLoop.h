@@ -2,12 +2,8 @@
 #define EVENTLOOP_H
 /*
         EventLoop 是网络库的核心处理单元。所有事件网络事件和用户回调都会在这一个io线程中被处理。
-    muduo 采用的是 one loop one thread ，每个循环一个线程。这样做法简单高效，不易出现线程同步问题。少加锁性能高
-
-        eventloop有两个任务处理队列，一个积攒的是待处理任务，外部可见，供外部插入任务；内部是一个任务队列，
-    内部的逻辑是不停拷出外部队列，然后处理，循环此步骤。所以拷贝过程需要加锁
+    采用的是 one loop one thread ，每个循环一个线程。这样做法简单高效，不易出现复杂的线程同步问题。少加锁性能高
 */
-
 #include <atomic>
 #include <mutex>
 #include <vector>
@@ -34,6 +30,8 @@ public:
     //添加任务
     void addTask(const Task& task);
     void addTask(Task&& task);
+    void addInQueue(const Task& task);
+    void addInQueue(Task&& task);
 
     /**
      * @brief 定时任务
