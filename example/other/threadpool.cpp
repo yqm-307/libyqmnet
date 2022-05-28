@@ -12,18 +12,16 @@ void test();
 int main()
 {
     Timestamp a = clock::now();
-
     test();
-
     Timestamp b = clock::now();
     time_t ms = (b-a).count()/(1000*1000);
-    printf("总耗时： %d ms\n",ms);
+    printf("总耗时： %d ms\n",ms-1000);
 }
 void test()
 {
     Util::ThreadPool<std::function<void()>> pool(200,10000); //创建线程池
     atomic_int dosome(0);
-    mutex _lock;
+    net::Mutex _lock;
 
     for(int i=0;i<1000000;++i)
     {
@@ -35,6 +33,4 @@ void test()
     }
     sleep(1);
     cout<<"some :"<< dosome<<endl;
-    
-    //while(1);
 }

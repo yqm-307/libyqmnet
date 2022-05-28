@@ -75,9 +75,9 @@ void TcpServer::startInLoop()
             &TcpServer::runInThread,this,i));
             
         {
-            std::unique_lock<std::mutex> lock(_mutex);
+            net::lock_guard<Mutex> lock(_mutex);
             while(_loops[i] == nullptr)
-                _cond.wait(lock);
+                _cond.wait();
         }
         _threads.emplace_back(thread);
     }
@@ -94,7 +94,7 @@ void TcpServer::runInThread(size_t index)
     server.setWriteCompleteCallback(_writeCompleteCallback);
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        net::lock_guard<Mutex> lock(_mutex);
         _loops[index] = &loop;
         _cond.notify_one(); //唤醒一个
     }

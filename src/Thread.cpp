@@ -1,5 +1,6 @@
 #include "../include/Thread.h"
 #include "../include/Logger.h"
+#include "../include/MyLocker.h"
 #include <unistd.h>
 
 using namespace Util;
@@ -89,7 +90,6 @@ bool Thread::Start(T& object,ThreadStatus(T::*func)(Data),Data data)
 //唤醒当前线程
 void Thread::ReStart()
 {
-    std::unique_lock<std::mutex> lock(_lock);
     //进入ReStart
     if(_block)
     {
@@ -100,9 +100,8 @@ void Thread::ReStart()
 //阻塞当前线程
 void Thread::Block()
 {
-    std::unique_lock<std::mutex> lock(_lock);
     _block=true;    //开始阻塞
-    _cv.wait(lock);             
+    _cv.wait();             
     _block=false;   //阻塞结束
 }
 

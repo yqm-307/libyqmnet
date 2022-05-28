@@ -38,7 +38,7 @@ void TimerQueue::ReSetTimer(TimeTask* task)
         task->updateStamp();
         //插回
         {
-            std::lock_guard<std::mutex> lock(_lock);
+            lock_guard<Mutex> lock(_lock);
             _timetasks.insert(pair(reinterpret_cast<uint64_t>(task),task));
 
         }
@@ -50,7 +50,7 @@ void TimerQueue::handle()
 {
     auto now = clock::now();
     {
-        std::lock_guard<std::mutex> lock(_lock);
+        lock_guard<Mutex> lock(_lock);
         auto& timeoutqueue = _timeoutqueue;    //超时对了
         for (auto p : _timetasks)
         {

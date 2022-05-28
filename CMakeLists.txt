@@ -23,7 +23,7 @@ set(INCLUDE_FILE
     include/IPAddress.h
     include/Logger.h
     include/noncopyable.h
-    include/Spinlock.h
+    include/MyLocker.h
     include/TcpClient.h
     include/TcpConnection.h
     include/TcpServer.h

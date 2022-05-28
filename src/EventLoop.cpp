@@ -94,7 +94,7 @@ void EventLoop::addTask(Task&& task)
 void EventLoop::addInQueue(const Task& task)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+		net::lock_guard<Mutex> lock(_mutex);
         _pendingTasks.push_back(task);
     }
     if(!isInLoopThread() || _doingPendingTasks)
@@ -104,7 +104,7 @@ void EventLoop::addInQueue(const Task& task)
 void EventLoop::addInQueue(Task&& task)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+		net::lock_guard<Mutex> lock(_mutex);
         _pendingTasks.push_back(std::move(task));
     }
     if(!isInLoopThread() || _doingPendingTasks)
@@ -207,7 +207,6 @@ void EventLoop::handleRead()
 
 /*
     将待处理task取出并处理。
-
         双队列：两个队列一个只在这个函数中存在不存在线程同步问题，另一个队列是在多线程环境下的需要加锁
     原本需要将每个任务取出并执行，然后退出，整个过程都是临界区。但是我们通过交换给临时队列，可以让临界
     区缩短为只有swap，代价就是消耗额外内存
@@ -217,7 +216,7 @@ void EventLoop::doPendingTasks()
     assertInLoopThread();
     std::vector<Task> tasks;
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+		net::lock_guard<Mutex> lock(_mutex);
         tasks.swap(_pendingTasks);
     }
     _doingPendingTasks = true;

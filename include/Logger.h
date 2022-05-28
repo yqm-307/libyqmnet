@@ -8,6 +8,7 @@
 #include <condition_variable>   //mutex
 #include "Config.h"
 #include "noncopyable.h"
+
 #include <functional>
 
 #if LOGGER_BUFFER_OFF
