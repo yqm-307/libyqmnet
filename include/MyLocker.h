@@ -4,8 +4,8 @@
 #include <pthread.h>
 #include <atomic>
 #include <thread>
-#include <Logger.h>
-#include <noncopyable.h>
+#include "Logger.h"
+#include "noncopyable.h"
 
 namespace net
 {
@@ -27,7 +27,7 @@ private:
 	_Lock& _lock;
 };
 
-class Mutex
+class Mutex:noncopyable
 {
 public:
 	Mutex():_mutex(PTHREAD_MUTEX_INITIALIZER){}
@@ -54,25 +54,33 @@ private:
 };
 
 //自旋锁
-class Spinlock
+class Spinlock:noncopyable
 {
 public:
-	Spinlock():
-		flag(ATOMIC_FLAG_INIT){}
+	Spinlock()
+	{	pthread_spin_init(&_spin,NULL); }
     
-	
+	~Spinlock(){pthread_spin_destroy(&_spin);}
     void lock()
 	{
-		while (flag.test_and_set(std::memory_order_acquire));
+		if(0>pthread_spin_lock(&_spin))
+		{
+			FATAL("Spinlock::lock() error");
+			exit(-1);
+		}
 	}
 	
     void unlock()
 	{
-		flag.clear(std::memory_order_release);
+		if(0>pthread_spin_unlock(&_spin))
+		{
+			FATAL("Spinlock::unlock() error!");
+			exit(-1);
+		}		
 	}
 
 private:
-	std::atomic_flag flag;
+	pthread_spinlock_t _spin;
 };
 
 
@@ -121,6 +129,7 @@ private:
 
 
 
+//
 class CountDownLatch:noncopyable
 {
 public:
