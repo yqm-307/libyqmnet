@@ -13,6 +13,7 @@
 #include <atomic>
 
 #include "Logger.h"
+#include "MyLocker.h"
 
 
 
@@ -46,8 +47,8 @@ private:
     std::atomic_bool _block;
     std::atomic_bool _running; //是否在运行中
     std::thread _thread;
-    std::mutex  _lock;
-    std::condition_variable _cv;
+    net::Mutex  _lock;
+    net::Sem_t _cv;
 };
 }
 

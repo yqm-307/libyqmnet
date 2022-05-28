@@ -51,7 +51,7 @@ public:
 					return Stop;
 				int freetime=0;
 				{//进入临界区
-					std::unique_lock<std::mutex> lock(_lock);
+					net::lock_guard<net::Mutex> lock(_lock);
 					if(_taskqueue.empty())	//队列空，阻塞
 					{
 						--_run_num;		//正在运行线程数减1
@@ -84,7 +84,7 @@ public:
 			int queuesize=0;
 			ThreadPoolErrnoCode ret = Success;
 			{//进入临界区
-				std::unique_lock<std::mutex> lock(_lock);
+				net::lock_guard<net::Mutex> lock(_lock);
 				if(queuesize >= _initqueuesize)	//超出任务数
 				{
 					ret = TaskQueueFull;
@@ -109,7 +109,7 @@ public:
 			int queuesize=0;
 			ThreadPoolErrnoCode ret = Success;
 			{//进入临界区
-				std::unique_lock<std::mutex> lock(_lock);
+				net::lock_guard<net::Mutex> lock(_lock);
 				if(queuesize >= _initqueuesize)	//超出任务数
 				{
 					ret = TaskQueueFull;
@@ -132,7 +132,7 @@ public:
 	{ return _run_num; }
 	int TaskNum()
 	{
-		std::unique_lock<std::mutex> lock(_lock);
+		net::lock_guard<net::Mutex> lock(_lock);
 		return _taskqueue.size();
 	}
 private:
@@ -152,7 +152,13 @@ private:
 			}
 		}
 	}
-	//唤醒一个线程,目前是遍历
+
+
+	/**
+	 * @brief 线程调度 当前是遍历，会出现严重的饥饿现象
+	 * @return true 
+	 * @return false 
+	 */
 	bool WakeUpOne()
 	{
 		//遍历所有线程
@@ -174,7 +180,7 @@ private:
 	std::atomic_bool _pool_is_in_run;		//是否正在运行
 	ThreadList _threads;					//线程
 	std::queue<TaskFunc> _taskqueue;		//任务队列
-	std::mutex _lock;
+	net::Mutex _lock;
 	std::atomic_int _run_num;				//正在运行数量
 	//net::TimerQueue _timer;					//每个线程记录空闲时间
 };

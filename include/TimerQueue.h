@@ -12,6 +12,7 @@
 #include "TimeTask.h"
 #include "Channel.h"
 #include "ThreadPool.h"
+#include "MyLocker.h"
 
 namespace net
 {
@@ -34,7 +35,7 @@ private:
     Util::ThreadPool<TimerCallback> _async_evt_pool;    //异步事件池
     std::vector<std::pair<timetask_t,TimeTask*>> _timeoutqueue;
     std::map<timetask_t,TimeTask*,std::function<bool(timetask_t,timetask_t)>> _timetasks;
-    std::mutex _lock;
+    Mutex _lock;
 };
 
 }

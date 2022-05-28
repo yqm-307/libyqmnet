@@ -11,6 +11,7 @@
 #include "IPAddress.h"
 #include "CallBack.h"
 #include "noncopyable.h"
+#include "MyLocker.h"
 
 namespace net
 {
@@ -52,11 +53,11 @@ private:
     TcpServerSinglePtr _baseServer;
     ThreadPtrList _threads;
     EventLoopList _loops;
+    net::Mutex _mutex;
     size_t _threadnums;
     std::atomic_bool _state;
     IPAddress _local;
-    std::mutex _mutex;
-    std::condition_variable _cond;
+    net::Sem_t _cond;
 
     ThreadInitCallback _threadInitCallback;
     ConnectionCallback _connectionCallback;
