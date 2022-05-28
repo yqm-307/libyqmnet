@@ -12,6 +12,7 @@
 
 #include "Epoller.h"
 #include "TimerQueue.h"
+#include "MyLocker.h"
 
 namespace net
 {
@@ -67,7 +68,7 @@ private:
     Epoller::ChannelList _channels;
     const int _wakeupFd;            //通过signal机制，唤醒自己
     Channel _wakeupChannel; 
-    std::mutex _mutex;
+    Mutex _mutex;
     std::vector<Task> _pendingTasks;    //加锁
 
     TimerQueue _timerQueue;             
