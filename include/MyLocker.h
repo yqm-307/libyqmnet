@@ -30,7 +30,10 @@ private:
 class Mutex:noncopyable
 {
 public:
-	Mutex():_mutex(PTHREAD_MUTEX_INITIALIZER){}
+	Mutex()
+	{
+		pthread_mutex_init(&_mutex,NULL);
+	}
 	~Mutex(){pthread_mutex_destroy(&_mutex);}
 	void lock()
 	{
@@ -48,6 +51,7 @@ public:
 			exit(-1);
 		}
 	}
+	pthread_mutex_t& getlock(){return _mutex;}
 
 private:
 	pthread_mutex_t _mutex;
@@ -88,17 +92,18 @@ class Sem_t:noncopyable
 {
 public:
 	Sem_t()
-		:_mutex(PTHREAD_MUTEX_INITIALIZER),
-		_cond_t(PTHREAD_COND_INITIALIZER){}
+	{
+		pthread_cond_init(&_cond_t,NULL);
+	}
 	~Sem_t()
 	{
-		pthread_mutex_destroy(&_mutex);
 		pthread_cond_destroy(&_cond_t);
 	}
 
 	void wait()
 	{
-		if( 0 > pthread_cond_wait(&_cond_t,&_mutex))
+		lock_guard<Mutex> lock(_mutex);
+		if( 0 > pthread_cond_wait(&_cond_t,&_mutex.getlock()))
 		{
 			FATAL("MyLocker::sem_t::wait() error!");
 			exit(-1);
@@ -106,6 +111,7 @@ public:
 	}
 	void notify_one()
 	{
+		
 		if(0>pthread_cond_signal(&_cond_t))
 		{
 			FATAL("sem_t::notify_one() error!");
@@ -123,7 +129,7 @@ public:
 	}
 
 private:
-	pthread_mutex_t _mutex;
+	Mutex _mutex;
 	pthread_cond_t _cond_t;
 };
 
@@ -133,32 +139,35 @@ private:
 class CountDownLatch:noncopyable
 {
 public:
-	CountDownLatch(int cot):_count(cot){}
+	CountDownLatch(int cot):_count(cot)
+	{
+		_sem = PTHREAD_COND_INITIALIZER;
+	}
 	~CountDownLatch()
 	{
 		if(_count!=0)
-			DEBUG("~CountDownLatch() _count=%d",_count);
+			DEBUG("~CountDownLatch() _count=%d",_count.load());
 	}
 
 	void wait()
 	{
-		lock_guard<Mutex> lock(_lock);
-		while(_count > 0)
-			_sem.wait();
+		net::lock_guard<Mutex> lock(_lock);
+		if(_count > 0)
+			pthread_cond_wait(&_sem,&_lock.getlock());
 	}	
 	//todo 设置超时的阻塞时间
 	//void clockwait(Timestamp);
 	void down()
 	{
-		lock_guard<Mutex> lock(_lock);
 		--_count;
+		//INFO("count %d",_count.load());
 		if(_count <= 0)
-			_sem.notify_all();
+			pthread_cond_broadcast(&_sem);
 	}
 private:
-	int _count;
+	std::atomic_int _count;
 	Mutex _lock;
-	Sem_t _sem;
+	pthread_cond_t _sem;
 };
 
 
