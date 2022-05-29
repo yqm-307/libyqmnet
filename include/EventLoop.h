@@ -25,12 +25,19 @@ public:
 
     //主循环
     void loop();
-    void sleep();   
+    void sleep();
     void wakeup();
     
-    //添加任务
+    /**
+     * @brief 添加 io 任务，需要在主线程中循环，有严格的次序要求
+     * @param task 
+     */
     void addTask(const Task& task);
     void addTask(Task&& task);
+    /**
+     * @brief 其他类型任务，可在任何线程中循环，可封装线程池
+     * @param task 
+     */
     void addInQueue(const Task& task);
     void addInQueue(Task&& task);
 

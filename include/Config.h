@@ -6,6 +6,6 @@
 #define YNET_TIMER_ASYNCEVENTSPOOL_SIZE 8    //定时器的异步事件池，线程数量
 #define YNET_LOGGER_BUFFER_OFF false         //logger是否启动buffer
 
-
+#define YNET_THREADPOOL_RUN_IN_MAIN_THREAD false
 
 #endif
