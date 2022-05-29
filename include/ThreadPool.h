@@ -18,6 +18,7 @@
 #include <cassert>
 #include "CallBack.h"
 #include "Thread.h"		//封装线程
+#include "Config.h"
 #include "Logger.h"
 
 
@@ -38,23 +39,21 @@ public:
 		:_threadnum(thnum),
 		_initqueuesize(maxqueuesize),
 		_threads(thnum,nullptr),
-		_pool_is_in_run(true),
-		_run_num(thnum)
+		_pool_is_in_run(true)
 	{
 		for(int i=0;i<_threadnum;++i)
 		{
 			_threads[i] = new Thread();
 			Thread* ptr = _threads[i];
 			//执行任务线程
-			ptr->Start([this]()->ThreadStatus{
+			ptr->Start(std::bind([this](Thread* ptr)->ThreadStatus{
 				if(!_pool_is_in_run)
 					return Stop;
-				int freetime=0;
 				{//进入临界区
 					net::lock_guard<net::Mutex> lock(_lock);
-					if(_taskqueue.empty())	//队列空，阻塞
+					if(_taskqueue.empty())	//没有任务
 					{
-						--_run_num;		//正在运行线程数减1
+						_freethreads.push(ptr);
 						return Blocking;
 					}
 					else{	//队列非空，取出任务执行
@@ -63,13 +62,15 @@ public:
 					}
 				}
 				return Running;	
-			});
+			},ptr));
 		}
 	}
 	//线程池析构并不是热点操作，所以没有性能要求
 	~ThreadPool()
 	{
 		stop();
+		TRACE("queuetask %d\nfree thread: %d",_taskqueue.size(),_freethreads.size());
+
 		for(auto ptr : _threads)
 		{
 			delete ptr;
@@ -81,24 +82,24 @@ public:
 	{
 		if(_pool_is_in_run)	//线程池在运行中
 		{
-			int queuesize=0;
-			ThreadPoolErrnoCode ret = Success;
 			{//进入临界区
 				net::lock_guard<net::Mutex> lock(_lock);
-				if(queuesize >= _initqueuesize)	//超出任务数
+				if(_taskqueue.size() >= _initqueuesize)	//超出任务数
 				{
-					ret = TaskQueueFull;
+#if(YNET_THREADPOOL_RUN_IN_MAIN_THREAD)
+					task();
+					return Success;
+#else
+					return TaskQueueFull;
+
+#endif
 				}
+
 				_taskqueue.push(task);	//插入任务队列
-			
-				if(_run_num<_threadnum)	//当前有挂起的线程,唤醒一个线程
-				{
+				if(!_freethreads.empty())
 					WakeUpOne();
-				}
 			}
-		
-			
-			return ret;
+			return Success;
 		}
 		return PoolStop;	//线程池停止运行
 	}
@@ -106,30 +107,30 @@ public:
 	{
 		if(_pool_is_in_run)	//线程池在运行中
 		{
-			int queuesize=0;
-			ThreadPoolErrnoCode ret = Success;
 			{//进入临界区
 				net::lock_guard<net::Mutex> lock(_lock);
-				if(queuesize >= _initqueuesize)	//超出任务数
+				if(_taskqueue.size() >= _initqueuesize)	//超出任务数
 				{
-					ret = TaskQueueFull;
+#if(YNET_THREADPOOL_RUN_IN_MAIN_THREAD)
+					task();
+					return Success;
+#else
+					return TaskQueueFull;
+
+#endif
 				}
-				_taskqueue.push(std::move(task));	//插入任务队列
-				if(_run_num<_threadnum)	//当前有挂起的线程,唤醒一个线程
-			
-				WakeUpOne();
-			
+				
+				_taskqueue.push(task);	//插入任务队列
+				if(!_freethreads.empty())
+					WakeUpOne();
 			}
-			
-			
-			
-			return ret;
+			return Success;
 		}
 		return PoolStop;	//线程池停止运行
 	}
 
 	int RunThreadNum()
-	{ return _run_num; }
+	{ return (_threadnum - _freethreads.size()); }
 	int TaskNum()
 	{
 		net::lock_guard<net::Mutex> lock(_lock);
@@ -161,17 +162,11 @@ private:
 	 */
 	bool WakeUpOne()
 	{
-		//遍历所有线程
-		assert(_threads[0]!=nullptr);
-		for(int i=0;i<_threadnum;++i)
-		{
-			if(_threads[i]->isBlock()){
-				_threads[1]->ReStart();
-				++_run_num;
-				return true;
-			}
-		}
-		return false;	//唤醒失败
+		if(_freethreads.empty())
+			return false;	//唤醒失败
+		_freethreads.front()->ReStart();
+		_freethreads.pop();
+		return true;
 	}
 
 	const int _threadnum;					//初始线程数量
@@ -181,10 +176,12 @@ private:
 	ThreadList _threads;					//线程
 	std::queue<TaskFunc> _taskqueue;		//任务队列
 	net::Mutex _lock;
-	std::atomic_int _run_num;				//正在运行数量
-	//net::TimerQueue _timer;					//每个线程记录空闲时间
+	std::queue<Thread*> _freethreads;			//空闲队列	用作线程调度
 };
+
 }
+
+
 
 #endif
 
