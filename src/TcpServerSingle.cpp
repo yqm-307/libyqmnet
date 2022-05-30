@@ -37,8 +37,8 @@ void TcpServerSingle::OnConnection(int connfd,const IPAddress& local,const IPAdd
     if(_encode)
         conn->setEnCode(_encode);
     // enable and tie channel
-    conn->buildOver();   //建立连接，启动channel
-    _connectioncb(conn);        //打印数据
+    conn->buildOver();   //建立连接，注册到epoll
+    _connectioncb(conn);        //连接建立时回调
 }
 
 //连接关闭时回调

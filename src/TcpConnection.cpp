@@ -89,7 +89,7 @@ void TcpConnection::buildOver()
 void TcpConnection::send(const char* data,size_t len)
 {
     if(_state != Connected){
-        WARN("TcpConnection::send() connected,can't send!");
+        WARN("TcpConnection::send() is not connected,can't send!");
         return;
     }
     if(_encode)

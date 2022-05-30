@@ -4,11 +4,11 @@ add_compile_options(
     -std=c++14
 )
 
-add_executable(EchoClient EchoClient.cpp )
-target_link_libraries(EchoClient  yqmnet)
 
-add_executable(EchoServer EchoServer.cpp)
-target_link_libraries(EchoServer  yqmnet)
+
+add_subdirectory(Echo)
+
+add_subdirectory(NthreadEcho)
 
 add_subdirectory(other)
 

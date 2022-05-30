@@ -74,11 +74,10 @@ void TcpServer::startInLoop()
         auto thread = new std::thread(std::bind(
             &TcpServer::runInThread,this,i));
             
-        {
-            net::lock_guard<Mutex> lock(_mutex);
-            while(_loops[i] == nullptr)
-                _cond.wait();
-        }
+        
+        while(_loops[i] == nullptr)
+            _cond.wait();
+        
         _threads.emplace_back(thread);
     }
 }
